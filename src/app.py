@@ -2,27 +2,26 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext, simpledialog, messagebox
-import google.generativeai as genai
+from config import GOOGLE_API_KEY
+from ai_service import configure_ai, generate_ai_response
+from pdf_processor import scan_and_filter_pdf
+#import google.generativeai as genai
 
 
 # Get API key from environment variable
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     print("Error: GOOGLE_API_KEY environment variable not set.")
     exit()
 
 # Configure the API key
-genai.configure(api_key=GOOGLE_API_KEY)
+model = configure_ai(GOOGLE_API_KEY)
 
-# model, using gemini 2.0 flash since it is the best version available for free tier.
-model = genai.GenerativeModel('gemini-2.0-flash')
-
-def generate_ai_response(prompt, output_text):
+def inital_response(prompt, output_text):
     """Sends the prompt to the Gemini model and updates the output text area."""
     try:
-        response = model.generate_content(prompt)
+        response = generate_ai_response(model, prompt)
         output_text.config(state=tk.NORMAL)  # Enable editing
-        output_text.insert(tk.END, f"AI: {response.text}\n\n", "ai")
+        output_text.insert(tk.END, f"AI: {response}\n\n", "ai")
         output_text.config(state=tk.DISABLED) # Disable editing
         output_text.see(tk.END)             # Scroll to the end
     except Exception as e:
@@ -43,7 +42,7 @@ def send_prompt():
 
         output_text.update_idletasks() ## Update the UI before generating the response
 
-        generate_ai_response(user_prompt, output_text)
+        inital_response(user_prompt, output_text)
 
 def on_closing():
     """Handles window closing."""
