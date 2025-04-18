@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from tkinter import ttk
 from tkinter import scrolledtext, simpledialog, messagebox
 import google.generativeai as genai
 
@@ -21,7 +22,7 @@ def generate_ai_response(prompt, output_text):
     try:
         response = model.generate_content(prompt)
         output_text.config(state=tk.NORMAL)  # Enable editing
-        output_text.insert(tk.END, f"AI: {response.text}\n\n")
+        output_text.insert(tk.END, f"AI: {response.text}\n\n", "ai")
         output_text.config(state=tk.DISABLED) # Disable editing
         output_text.see(tk.END)             # Scroll to the end
     except Exception as e:
@@ -36,9 +37,12 @@ def send_prompt():
     if user_prompt:
         input_entry.delete(0, tk.END)  # Clear the input field
         output_text.config(state=tk.NORMAL)
-        output_text.insert(tk.END, f"You: {user_prompt}\n")
+        output_text.insert(tk.END, f"You: {user_prompt}\n\n", "user")
         output_text.config(state=tk.DISABLED)
         output_text.see(tk.END)
+
+        output_text.update_idletasks() ## Update the UI before generating the response
+
         generate_ai_response(user_prompt, output_text)
 
 def on_closing():
@@ -50,17 +54,32 @@ def on_closing():
 root = tk.Tk()
 root.title("Simple Gemini AI Chat")
 
+
+#styles
+style = ttk.Style(root)
+style.configure("TButton", padding=5, font=('Arial', 10))
+style.configure("TEntry", padding=5, font=('Arial', 10), foreground="#003366")
+style.configure("TScrolledtext.Vertical.TScrollbar", troughcolor="lightgray")
+style.configure("TScrolledtext.Horizontal.TScrollbar", troughcolor="lightgray")
+
+
+
 # Output display area (scrolled text)
-output_text = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED)
+output_text = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED, font=('Consolas', 10))
 output_text.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
+# display output and input as different colors
+output_text.tag_configure("user", foreground="#228B22")
+output_text.tag_configure("ai", foreground="#1E3A8A")
+
 # Input entry field
-input_entry = tk.Entry(root)
+input_entry = ttk.Entry(root, style="TEntry")
 input_entry.pack(padx=10, pady=5, fill=tk.X)
 
 # Send button
-send_button = tk.Button(root, text="Send", command=send_prompt)
-send_button.pack(pady=5)
+send_button = tk.Button(root, text="Submit", bg="#4CAF50", fg="white", font=('Arial', 10), padx=10, pady=5, command=send_prompt)
+send_button.pack()
+#pady = 5
 
 # Handle window closing
 root.protocol("WM_DELETE_WINDOW", on_closing)
