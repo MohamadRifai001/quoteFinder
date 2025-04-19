@@ -1,4 +1,5 @@
 import os
+import json
 import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext, simpledialog, messagebox
@@ -85,3 +86,16 @@ root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Start the Tkinter event loop
 root.mainloop()
+
+
+
+
+
+# code for calling the pdf_processor function
+
+input_folder = "../data/input_pdfs"
+keywords = ["keyword1", "keyword2", "..."]  # Replace with actual keywords
+filtered_pages = scan_and_filter_pdf(input_folder, keywords)
+
+# Print to console (for debug)
+print(json.dumps(filtered_pages, indent=2))
