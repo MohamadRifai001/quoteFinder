@@ -14,7 +14,11 @@ model = configure_ai(GOOGLE_API_KEY, temperature=0)
 def handle_user_prompt(prompt):
     try:
         # Do your prompt engineering here:
-        full_prompt = f" Answer this question: \n{prompt}"
+        full_prompt = f"""Identify a list of the main keywords from the Essay Question
+        or topic delimited by ``` 
+        give the list of the keywords along with the top 5 synonyms for each keyword.
+        ensure the synonyms are relevant to the given topic.
+        ```{prompt}```"""
 
         response = generate_ai_response(model, full_prompt)
 
