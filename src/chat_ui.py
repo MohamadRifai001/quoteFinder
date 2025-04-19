@@ -35,12 +35,12 @@ class ChatUI:
         self.send_button.pack()
 
     def _handle_submit(self):
-        prompt = self.input_entry.get()
-        if prompt:
+        user_prompt = self.input_entry.get()
+        if user_prompt:
             self.input_entry.delete(0, tk.END)
-            self.display_message("You", prompt, tag="user")
+            self.display_message("You", user_prompt, tag="user")
 
-            self.on_submit(prompt)  # Tell the app logic: "User submitted this"
+            self.on_submit(user_prompt)  # Tell the app logic: "User submitted this"
 
     def display_message(self, sender, message, tag=None):
         self.output_text.config(state=tk.NORMAL)
