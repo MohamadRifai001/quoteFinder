@@ -29,12 +29,31 @@ def handle_user_prompt(user_prompt):
         ```{user_prompt}```
         """
 
-        response = generate_ai_response(model, full_prompt)
+        keywordResponse = generate_ai_response(model, full_prompt)
+        keywords = keywordResponse.split(",") # turns it into a list
+        keywords = [kw.strip().lower() for kw in keywords] # removes white space and makes it lowercase
+        keywords = list(set(keywords)) # removes duplicates incase there are any
 
-        filtered_pages = scan_and_filter_pdf(input_folder, response)
+        print(json.dumps(keywords, indent=2))   # print for debug
 
-        #print for debug
-        print(json.dumps(filtered_pages, indent=2))
+        filtered_pages = scan_and_filter_pdf(input_folder, keywords)
+
+        print(json.dumps(filtered_pages, indent=2)) #print for debug
+
+        full_promp2 = f"""
+        your task is to perform the following actions:
+        1. Scan through each page of the given JSON object delimited by --- and find relevant quotes.
+        2. For each quote remember the original page number and the source file name.
+        3. Ensure that the quotes are no more than 3 sentences long.
+        4. return a JSON object similar to the inputed pages one where the text is replaced by the quote.
+        5. if no quote was found for the text, simply replace the text with "no quote found"
+
+
+        Pages: ---{filtered_pages}---
+        Topic: ```{user_prompt}```
+        """
+
+        response = generate_ai_response(model, full_promp2)
 
         # Tell the UI to display it
         ui.display_message("AI", response, tag="ai")
