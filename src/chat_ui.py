@@ -39,6 +39,7 @@ class ChatUI:
         if prompt:
             self.input_entry.delete(0, tk.END)
             self.display_message("You", prompt, tag="user")
+
             self.on_submit(prompt)  # Tell the app logic: "User submitted this"
 
     def display_message(self, sender, message, tag=None):
@@ -46,6 +47,7 @@ class ChatUI:
         self.output_text.insert(tk.END, f"{sender}: {message}\n\n", tag)
         self.output_text.config(state=tk.DISABLED)
         self.output_text.see(tk.END)
+        self.output_text.update_idletasks()
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit the application?"):

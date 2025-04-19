@@ -8,13 +8,13 @@ if not GOOGLE_API_KEY:
     exit()
 
 # Configure the model
-model = configure_ai(GOOGLE_API_KEY)
+model = configure_ai(GOOGLE_API_KEY, temperature=0)
 
 # Prompt engineering + AI logic
 def handle_user_prompt(prompt):
     try:
         # Do your prompt engineering here:
-        full_prompt = f"Answer this clearly and briefly:\n{prompt}"
+        full_prompt = f" Answer this question: \n{prompt}"
 
         response = generate_ai_response(model, full_prompt)
 
