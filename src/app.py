@@ -13,7 +13,7 @@ if not GOOGLE_API_KEY:
 model = configure_ai(GOOGLE_API_KEY, temperature=0)
 
 # configure input folder
-input_folder = os.path.abspath("../testproject/data/input_pdfs")
+input_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/input_pdfs")
 
 # Prompt engineering + AI logic
 def handle_user_prompt(user_prompt):
