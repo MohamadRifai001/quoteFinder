@@ -7,6 +7,7 @@ __pycache__/
 
 # Ignore data or other non-source code files if needed
 /data/*
+/vector_store/*
 
 # Editor-specific files (e.g., VSCode, PyCharm)
 .vscode/

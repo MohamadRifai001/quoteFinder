@@ -3,7 +3,7 @@ import os
 from config import GOOGLE_API_KEY
 from ai_service import configure_ai, generate_ai_response
 from chat_ui import ChatUI
-from pdf_processor import scan_and_collect_pages
+from pdf_processor import scan_and_embed_pdfs, semantic_search
 # Safety check
 if not GOOGLE_API_KEY:
     print("Error: GOOGLE_API_KEY environment variable not set.")
@@ -15,39 +15,36 @@ model = configure_ai(GOOGLE_API_KEY, temperature=0)
 # configure input folder
 input_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/input_pdfs")
 
+scan_and_embed_pdfs(input_folder)
+
+# cleans up the result so that it is formatted correctly for LLM
+def format_for_llm(matches):
+    formatted = []
+    for doc, meta in zip(matches['documents'][0], matches['metadatas'][0]):
+        formatted.append({
+            "source_file": meta["source_file"],
+            "page": meta["original_page"],
+            "text": doc.strip()
+        })
+    return formatted
+
+
+
+
+
 # Prompt engineering + AI logic
 def handle_user_prompt(user_prompt):
     try:
-        # Do your prompt engineering here:
-        full_prompt = f"""
-        your task is to perform the following actions:
-        1. Identify a list of the main keywords from the Essay Question or topic delimited by ```
-        2. For each keyword, find the top 5 synonyms from the thesaurus.
-        give the list of the keywords along with the top 5 synonyms for each keyword.
-        3. Ensure that the synonyms are relevant to the given topic.
-        4. Provide a list of keywords and their synonyms as lowercase words separated by commas.
-        Do not include any introductory phrases, headings, bullet points, or other formatting.
-        ```{user_prompt}```
-        """
-
-        keywordResponse = generate_ai_response(model, full_prompt)
-        keywords = keywordResponse.split(",") # turns it into a list
-        keywords = [kw.strip().lower() for kw in keywords] # removes white space and makes it lowercase
-        keywords = list(set(keywords)) # removes duplicates incase there are any
-
-        print(json.dumps(keywords, indent=2))   # print for debug
-
-        filtered_pages = scan_and_collect_pages(input_folder, keywords)
-
-        print(json.dumps(filtered_pages, indent=2)) #print for debug
+        matches = semantic_search(user_prompt, top_k=5)
+        filtered_pages = format_for_llm(matches)
 
         full_promp2 = f"""
         your task is to perform the following actions:
         1. Scan through each page of the given JSON object delimited by --- and find relevant quotes.
         2. For each quote remember the original page number and the source file name.
         3. Ensure that the quotes are no more than 3 sentences long.
-        4. Ensure that the quotes DO NOT contain "\n" or "\r\n" characters.
-        5. if no quote was found for the text, simply replace the text with "no quote found"
+        4. Ensure that the quotes DO NOT contain "\n" or "\r" characters.
+        5. if no quote was found for the text, ignore that quote and move on to the next one.
         6. Select the 5 best quotes from all pages.
         7. return a JSON object similar to the inputed pages one where the text is replaced by the quote.
 

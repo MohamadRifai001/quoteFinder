@@ -8,12 +8,12 @@ pip install -r requirements.txt (Install the nessesary requirements and dependen
 create a /data/input_pdfs folder for input pdfs.
 python src/app.py (to run the app.)
 
-make sure you put your pdf files in the input_pdfs folder, then type in the essay question or topic.
+make sure you put your pdf files in the /data/input_pdfs folder, then type in the essay question or topic.
 
 Should now print out the original file name, page number, and the quote that the model selected.
 
 
 TODO:
 
-fix bug with \n characters being included in the quotes.
 allow the user to input how many quotes they want, 1, 5, 10, 15... etc.
+Allow users to upload files rather than having to place them in the /data/input_pdfs folder
